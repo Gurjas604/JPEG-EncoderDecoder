@@ -25,6 +25,9 @@ When reversing the effects of compression, we simply followed the formula outlin
 
 The effects of chromatic downsampling was visible before the application of DCT and quantization. The 4:2:2 downsampling had a clear advantage over 4:2:0, the lower chrominance resolution was clearly visible compared to the original image where the higher chrominance resolution difference was only barely detectable to the eye. The effects of DCT and quantization results in clear visible white dots on the final image. It is suspected to be due to errors in the programming portions of this project. We hope to fix this portion in the future but different quantization matrices yield no obvious 
 
+### Created By:
+Gurjas Rai, Zi Xiang Zhao
+
 ### Screenshot
 ![Image of GUI](https://github.com/Gurjas604/Proj/blob/master/screen-shots/Screen%20Shot%202019-08-13%20at%209.27.17%20PM.png?raw=true)
 
