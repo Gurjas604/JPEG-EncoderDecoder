@@ -21,10 +21,10 @@ As previously mentioned, the 8x8 information block is mostly weighted at the low
 
 When reversing the effects of compression, we simply followed the formula outlined by the lectures for reversing the DCT, then multiplied the quantization matrix to obtain the Y, U, and V information.
 
-## Initilization 
+### Initilization 
 User need to specify the picture that the encoding/decoding is to be performed using the GUI that we have included. The program parse the image provided by the user and gets all the pixel values. Each of the pixel values are stored in matrixs. After storing pixel values the RGB color space is converted into YUV color space using matrix multiplication. 4.2.0 Chroma Sub-sampling is applied to the pixles. 
 
-## Encoding/Decoding
+### Encoding/Decoding
 After all the previous steps are complete, Y and UV colors are displayed in the GUI with the use of `javax.swing.*` library. Then the DCT matrix and Quantization is applied to the pixel values. DCT is implemented in `DCTmaker(Matrix A);` function. Qunatization tables are implemented in `lum(Matrix A, double Q);` and `chrom(Matrix A, double Q);` funtions. This step marks the end of encoding process, though further compression can be achieved using Huffman encoding algorithm. For the decoding process same steps are applied in reverse order. Unquantization -> inverse DCT -> RGB color space conversion. After decoding process the image retirved is exaclty similar to the image at the start with some loss. This loss is determined by the quantization tables.
 
 ## Conclusion
