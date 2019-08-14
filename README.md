@@ -1,47 +1,34 @@
-# Memory_management
-Making custom memory management algorithms that can allocate, deallocate, and compact allocated memory
+# JPEG Encoder/Decoder
+This project is created following the outline of Assignment 2 from CMPT 365 Multimedia Systems, with the goal of showing the effects of lossy compression. Lossy compression is a class of data encoding methods that estimates the original image instead of keeping an exact representation, therefore losing information in the process, hence the “lossy” part of the name. This project aims to emulate the effects of JPEG compression, a widely used lossy compression method using the specified quantization table DCT matrix along with 4:2:0 chromatic downsampling.
+
+## Method
+
+The project is coded in java, doing the color space conversion, downsampling, discrete cosine transformation, and quantization components of the JFIF format from the JPEG compression type, then decodes the same information in order to demonstrate the effects of said compression method on the visual qualities of a digital picture. The `java.awt.image.BufferedImage` and `javax.imageio.*` libraries are used to display the images in a simple GUI and a `Matrix` class from princeton.edu is used for calculations.
+
+The color space used in this project is in the YUV basis, to convert to this from the regular RGB basis, one line equations were used instead of matrix multiplication to increase the readability of the code, equations used are as follows:
+```
+-       Y =  0.299R + 0.587G + 0.114B
+-       U = -0.147R - 0.289G + 0.436B
+-       V =  0.615R - 0.515G - 0.100B
+```
+The reasoning behind this conversion is that the human eye is more sensitive to some colors compared to others, which results the weighted distribution of each color in the RGB basis in the conversion. This new basis represents color in luminous a component via the “Y” axis and the chrominous components via the “U” and “V” component.
+
+Downsampling is only applied to the chrominous portions of this YUV basis in a 4:2:0 scale. Which means that information in each of the UV axie is reduced to ¼ of their original size. This downsampling is the first part in the compression where information is actually lost, with the reasoning behind discarding this information being that people can’t see the chrominous part as well as the luminous parts. 
+
+The discrete cosine transform portion of the project is done by extracting individual 8x8 pixel blocks from the original picture and multiplying the DCT II matrix to it as outlined in the lectures. The reasoning behind this part of the conversion is that this multiplication is actually recording the intensity of each of the 64 cosine waves, which in combination with the fact that higher frequencies represents a much lower fraction of the picture, creates a situation where the information is clustered heavily at the lower frequencies, which will be useful later on in the quantization step. It is also useful to note that a library provided by princeton.edu was used to perform the matrix multiplication in both this step and the reverse of this step to simplify the process.
+
+As previously mentioned, the 8x8 information block is mostly weighted at the lower frequencies, with the higher frequencies often being an insignificant fraction to its counterpart. The quantization step allows for the removal of a significant portion of the higher frequency waves from the information block, which is done by dividing the entries in the 8x8 post DCT block by a corresponding entry in a predefined quantization table. This step is justified in the send that human recognition of certain patterns and patterns at higher frequencies is much worse than some others, therefore the quantization table entries are actually inverted weights of how sensitive the human eye is to that particular cosine wave pattern. Various ratios of the same quantization table was used. Ratios between zero and one resulted in more non-zero entries after the conversion, although the difference was not visibly distinguishable in the image at a reasonable zoom. While the higher ratios, such as 5x, resulted in a much more blocky image when compared to the original.
+
+When reversing the effects of compression, we simply followed the formula outlined by the lectures for reversing the DCT, then multiplied the quantization matrix to obtain the Y, U, and V information.
 
 ## Initilization 
-User need to specify the size of memory in `bytes` at the start of the program using function ``` initialize_allocator(size, MANAGEMENT_ALGORITHM);```
-* User can choose between 3 types of `MANAGEMENT_ALGORITHMS`
-    * `BEST_FIT` : satisfies the allocation request from the available memory block that at least as large as the requested size and that results in the smallest remainder fragment.
-    * `FIRST_FIT`: satisfies the allocation request from the first available memory block (from left) that is at least as large as the requested size.
-    * `WORST_FIT`: satisfies the allocation request from the available memory block that at least as large as the requested size and that results in the largest remainder fragment.
+User need to specify the picture that the encoding/decoding is to be performed using the GUI that we have included. The program parse the image provided by the user and gets all the pixel values. Each of the pixel values are stored in matrixs. After storing pixel values the RGB color space is converted into YUV color space using matrix multiplication. 4.2.0 Chroma Sub-sampling is applied to the pixles. 
 
-## Allocating Memory
-User need to use `kalloc(_size_);` function to allocate memory. This function returns a pointer to the allocated block of size `_size_`. If allocation fails then this function returns `NULL`. This function behaves similar to `malloc(_size_);`
+## Encoding/Decoding
+After all the previous steps are complete, Y and UV colors are displayed in the GUI with the use of `javax.swing.*` library. Then the DCT matrix and Quantization is applied to the pixel values. DCT is implemented in `DCTmaker(Matrix A);` function. Qunatization tables are implemented in `lum(Matrix A, double Q);` and `chrom(Matrix A, double Q);` funtions. This step marks the end of encoding process, though further compression can be achieved using Huffman encoding algorithm. For the decoding process same steps are applied in reverse order. Unquantization -> inverse DCT -> RGB color space conversion. After decoding process the image retirved is exaclty similar to the image at the start with some loss. This loss is determined by the quantization tables.
 
-## Deallocating Memory
-User need to use `kfree(_Ptr_);` function to take away the ownership of the block pointed by `_Ptr_`.  This function behaves similar to `free(_Ptr_);`
+## Conclusion
 
-#### Example Code 
-```
-int* p = (int*) kalloc(sizeof(int));
-if(p != NULL) 
-{
-    // do_some_work(p);
-    kfree(p);
-}
-```
-## Compacting Memory
-Continuous allocation and deallocation results in fragmentation of the memory. This can be solved by the function `compact_allocation( _before_, _after_);`. This function relocated all the data and moves all the fragmeneted free blocks to the end of the memory. `_before_` and `_after_` are arrays of `void*` pointers. `compact_allocation` functions writes the before and after addresses of the relocated blocks into these arrays. It is users job to allocate these arrays enough memory to hold all the addresses of the allocated blocks that have been relocated. `compact_allocation` function returns an `int` value that represents the number of blocks that have been relocated.
-```
-void* before[100];
-void* after[100]; // in this example, total pointers is less than 100
-int count = compact_allocation(before, after);
-for(int i=0; i<count; ++i) 
-{
-// Update pointers
-}
-```
+The effects of chromatic downsampling was visible before the application of DCT and quantization. The 4:2:2 downsampling had a clear advantage over 4:2:0, the lower chrominance resolution was clearly visible compared to the original image where the higher chrominance resolution difference was only barely detectable to the eye. The effects of DCT and quantization results in clear visible white dots on the final image. It is suspected to be due to errors in the programming portions of this project. We hope to fix this portion in the future but different quantization matrices yield no obvious 
 
-## Other Functionalities
-User can use `print_statistics();` to print out statistics about the current state of memory. Output would look as following:
-```
-Allocated size = 40
-Allocated chunks = 10
-Free size = 60
-Free chunks = 1
-Largest free chunk size = 60
-Smallest free chunk size = 60
-```
+
