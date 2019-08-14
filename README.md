@@ -27,5 +27,6 @@ The effects of chromatic downsampling was visible before the application of DCT 
 
 ## Screen-Shots
 [Image of GUI]
-(screen-shots/Screen Shot 2019-08-13 at 9.27.17 PM.png)
+(https://github.com/Gurjas604/Proj/blob/master/screen-shots/Screen%20Shot%202019-08-13%20at%209.27.17%20PM.png?raw=true)
+
 
